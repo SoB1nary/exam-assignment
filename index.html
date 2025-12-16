@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Exam testerer</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body { font-family: sans-serif; margin: 20px; }
+        section { margin-bottom: 20px; }
+        input { margin: 2px; }
+        pre { background: #f0f0f0; padding: 10px; }
+    </style>
+</head>
+<body>
+
+<h1>test</h1>
+
+<section>
+    <h2>sensors</h2>
+    Name: <input id="sensor_Name">
+    <input id="sensor_coordinates" placeholder="coordinates">
+    <input id="sensor_type" placeholder="type">
+    <input id="sensor_value" placeholder="value">
+    <button id="addsensor_Btn">Add</button>
+    <button id="listsensor_Btn">List</button>
+    <ul id="sensor_List"></ul>
+</section>
+
+
+<pre id="out"></pre>
+
+<script>
+    const root = 'http://localhost:3000/api';
+
+
+    $('#addsensor_Btn').click(() => {
+        $.ajax({
+            url: root + '/sensors',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ name: $('#sensor_Name').val(), coordinates: $('#sensor_coordinates').val(), type: $('#sensor_type').val(), value: Number($('#sensor_value').val())}),
+            success: res => $('#out').text('Sensor added: ' + JSON.stringify(res)),
+            error: xhr => $('#out').text(xhr.responseText)
+            
+        });
+    });
+
+    $('#listsensor_Btn').click(() => {
+        $.get(root + '/sensors', data => {
+            $('#sensor_List').empty();
+            data.forEach(c => {
+                $('#sensor_List').append(`
+            <li>
+              ID: ${c.id}, Name: ${c.name}, Coordinates: ${c.coordinates}, Type: ${c.type}, Value: ${c.value}
+              <button class="updsensor" data-id="${c.id}">Update</button>
+              <button class="delsensor" data-id="${c.id}">Delete</button>
+            </li>
+          `);
+            });
+        });
+    });
+
+    $(document).on('click', '.delsensor', function () {
+        const id = $(this).data('id');
+        $.ajax({
+            url: root + '/sensors/' + id,
+            method: 'DELETE',
+            success: () => {
+                $('#out').text('Sensor deleted');
+                $('#listsensor_Btn').click(); // refresh list
+            }
+        });
+    });
+
+
+    $(document).on('click', '.updsensor', function () {
+        const id = $(this).data('id');
+        const name = prompt('New name:');
+        const coordinates = prompt('New Coordinates:');
+        const type = prompt('New type:');
+        const text_value = prompt('New value:');
+        const value = int(text_value)
+        
+        $.ajax({
+            url: root + '/customers/' + id,
+            method: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify({ name, coordinates, type, value }),
+            success: res => {
+                $('#out').text('Updated: ' + JSON.stringify(res));
+                $('#listsensor_Btn').click(); // refresh list
+            }
+        });
+    });
+
+
+
+</script>
+
+</body>
+</html>
