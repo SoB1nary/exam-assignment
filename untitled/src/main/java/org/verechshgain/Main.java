@@ -181,7 +181,7 @@ class sqlDatabase implements database {
     }
 }
 public class Main {
-
+//        static db = new sqlDatabase();
         static mongoDatabase db = new mongoDatabase();
         public static void main(String[] args) {
             System.out.println("Hello.");

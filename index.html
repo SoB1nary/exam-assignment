@@ -78,11 +78,9 @@
         const name = prompt('New name:');
         const coordinates = prompt('New Coordinates:');
         const type = prompt('New type:');
-        const text_value = prompt('New value:');
-        const value = int(text_value)
-        
+        const value = prompt('New value:');
         $.ajax({
-            url: root + '/customers/' + id,
+            url: root + '/sensors/' + id,
             method: 'PUT',
             contentType: 'application/json',
             data: JSON.stringify({ name, coordinates, type, value }),
