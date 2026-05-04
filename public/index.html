@@ -48,6 +48,10 @@
     $('#listsensor_Btn').click(() => {
         $.get(root + '/sensors', data => {
             $('#sensor_List').empty();
+            if (data.length === 0) {
+                $('#out').text('No sensors found');
+                return;
+            }
             data.forEach(c => {
                 $('#sensor_List').append(`
             <li>

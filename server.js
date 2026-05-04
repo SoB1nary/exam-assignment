@@ -3,8 +3,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const {Pool} = require("pg");
-
+const pool= require("./db");
+const path = require('path');
 const app = express();
 app.use(bodyParser.json());
 app.use(cors());
@@ -13,13 +13,7 @@ app.use(cors());
 
  
 
-const pool = new Pool({
-    user: 'postgres',
-    host: 'localhost',
-    database: 'ict_exam',
-    password: 'password',
-    port: 5432,
-});
+app.use(express.static(path.join(__dirname, 'public')));
 
  
 
@@ -27,7 +21,10 @@ const pool = new Pool({
  
 app.use(express.json());
 
- 
+ app.get('/', (req, res) => {
+    // res.sendFile requires an absolute path
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
 app.get("/api/sensors", async (req, res) => {
     try {
  
@@ -40,7 +37,7 @@ app.get("/api/sensors", async (req, res) => {
     }
 });
 
-app.get("/api/sensors:id", async (req, res) => {
+app.get("/api/sensors/:id", async (req, res) => {
     try {
         const { id } = req.params;
 
@@ -76,7 +73,7 @@ app.post("/api/sensors", async (req, res) => {
 
         res.status(201).json(result.rows[0]);
     } catch (err) {
-        res.status(500).json({ error: err });
+        res.status(500).json({ error: "Database error" });
     }
 });
 
@@ -122,6 +119,7 @@ app.delete("/api/sensors/:id", async (req, res) => {
 });
 
 const PORT = 3000;
+module.exports = app;
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
